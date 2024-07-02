@@ -18,6 +18,7 @@ import {
 import { Send } from "@mui/icons-material";
 import toast, { Toaster } from "react-hot-toast";
 import CustomButton from "../Components/Button";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const ChittiChatbot = () => {
   const [message, setMessage] = useState("");
@@ -44,7 +45,9 @@ const ChittiChatbot = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("/api/v1/openai/chatbot", { message });
+      const response = await axios.post(`${apiUrl}/api/v1/openai/chatbot`, {
+        message,
+      });
       const botMessage = {
         sender: "chitti",
         text: `ShrihariBot replied: ${response.data.response}`,

@@ -15,6 +15,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import roboImage from "../assets/robogif.gif";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Register = () => {
   const navigate = useNavigate();
@@ -62,7 +63,10 @@ const Register = () => {
         return;
       }
 
-      const response = await axios.post("/api/v1/auth/register", formData);
+      const response = await axios.post(
+        `${apiUrl}/api/v1/auth/register`,
+        formData
+      );
       console.log("Registration successful", response.data);
       toast.success("Registered successfully");
       navigate("/login");

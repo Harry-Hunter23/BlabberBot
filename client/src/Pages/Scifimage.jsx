@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import toast, { Toaster } from "react-hot-toast";
 import CustomButton from "../Components/Button";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const GenerateSciFiImage = () => {
   const [prompt, setPrompt] = useState("");
@@ -30,7 +31,9 @@ const GenerateSciFiImage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("/api/v1/openai/image", { prompt });
+      const response = await axios.post(`${apiUrl}/api/v1/openai/image`, {
+        prompt,
+      });
       setImageUrl(response.data.imageUrl);
       toast.success("Image generated successfully!");
     } catch (error) {

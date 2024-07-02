@@ -16,6 +16,7 @@ import {
 import { Visibility, VisibilityOff, ContentCopy } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const Login = () => {
     }
 
     try {
-      const { data } = await axios.post("/api/v1/auth/login", {
+      const { data } = await axios.post(`${apiUrl}/api/v1/auth/login`, {
         email,
         password,
       });

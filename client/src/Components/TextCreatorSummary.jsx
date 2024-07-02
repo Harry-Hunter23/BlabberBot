@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
 import toast, { Toaster } from "react-hot-toast";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const Summarizer = () => {
   const [text, setText] = useState("");
@@ -27,7 +28,9 @@ const Summarizer = () => {
   const handleSummarize = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/v1/openai/summary", { text });
+      const response = await axios.post(`${apiUrl}/api/v1/openai/summary`, {
+        text,
+      });
       setSummary(response.data.summary);
     } catch (error) {
       console.error("Error summarizing text", error);
