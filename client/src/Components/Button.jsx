@@ -29,7 +29,7 @@ const CustomButton = () => {
       <Typography variant="body1" gutterBottom>
         Not this tool
       </Typography>
-      <Link to="/" style={{ textDecoration: "none", marginLeft: 8 }}>
+      <Link to="/dashboard" style={{ textDecoration: "none", marginLeft: 8 }}>
         <MUIButton
           variant="contained"
           color="primary"
