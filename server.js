@@ -7,7 +7,7 @@ const authRouter = require("./routes/authRoutes");
 const openaiRouter = require("./routes/openaiRoutes");
 const errorHandler = require("./Middlewares/errorHandlerMiddleware");
 const cookieParser = require("cookie-parser");
-
+const path = require("path");
 const app = express();
 
 // Middleware
@@ -33,9 +33,13 @@ app.use("/api/v1/openai", openaiRouter);
 
 // Error handling middleware (should be last)
 app.use(errorHandler);
-// Using Node.js Buffer directly
+//// Serve static files from the React app
+app.use(express.static(path.join(__dirname, "client/build")));
 
-// Handle the buffer as needed
+// Catchall handler for any requests that don't match above routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client/build", "index.html"));
+});
 
 // Running the server
 const PORT = process.env.PORT || 8080;
