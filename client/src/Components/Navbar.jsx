@@ -8,6 +8,7 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+const apiUrl = import.meta.env.VITE_API_URL;
 
 // Define the horizontal and vertical bouncing animation
 const bounce = keyframes`
@@ -28,7 +29,7 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/v1/auth/logout");
+      await axios.post(`${apiUrl}/api/v1/auth/logout`);
       localStorage.removeItem("authToken");
       toast.success("Logged out Successfully");
       navigate("/login");
