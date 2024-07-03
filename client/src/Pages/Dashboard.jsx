@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -16,9 +16,74 @@ import bot from "../assets/bot.gif";
 import travis from "../assets/travis.gif";
 import para from "../assets/paragraph.gif";
 
+const cardItems = [
+  {
+    image: summaryrobo,
+    alt: "Summary Image",
+    title: "Summarize the Text up to 500 words",
+    description: "Click the button below to start summarizing your content.",
+    link: "/summary",
+    buttonText: "Summarize",
+  },
+  {
+    image: para,
+    alt: "Paragraph Image",
+    title: "Generate a Paragraph from Words",
+    description: "Click the button below to generate the Paragraph.",
+    link: "/paragraph",
+    buttonText: "Generate the Paragraph",
+  },
+  {
+    image: bot,
+    alt: "Chatbot Image",
+    title: "ShrihariBot",
+    description: "Click the button below to chat with Shrihari's Bot.",
+    link: "/chatbot",
+    buttonText: "Chat with Shrihari's Bot",
+  },
+  {
+    image: travis,
+    alt: "SciFi Image",
+    title: "Generate a Sci-Fi Image from Text",
+    description: "Click the button below to generate a Sci-Fi image.",
+    link: "/image",
+    buttonText: "Generate a Sci-Fi Image",
+  },
+];
+
 const Dashboard = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const cards = useMemo(
+    () =>
+      cardItems.map((item, index) => (
+        <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          <Card sx={{ textAlign: "center" }}>
+            <CardMedia
+              component="img"
+              height="200"
+              image={item.image}
+              alt={item.alt}
+            />
+            <CardContent>
+              <Typography variant="h5" component="div" gutterBottom>
+                {item.title}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {item.description}
+              </Typography>
+              <Link to={item.link} style={{ textDecoration: "none" }}>
+                <Button variant="contained" color="primary">
+                  {item.buttonText}
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </Grid>
+      )),
+    []
+  );
 
   return (
     <Box
@@ -30,104 +95,10 @@ const Dashboard = () => {
       }}
     >
       <Grid container spacing={3} justifyContent="center">
-        <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ textAlign: "center" }}>
-            <CardMedia
-              component="img"
-              height="200"
-              image={summaryrobo}
-              alt="Summary Image"
-            />
-            <CardContent>
-              <Typography variant="h5" component="div" gutterBottom>
-                Summarize the Text up to 500 words
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Click the button below to start summarizing your content.
-              </Typography>
-              <Link to="/summary" style={{ textDecoration: "none" }}>
-                <Button variant="contained" color="primary">
-                  Summarize
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ textAlign: "center" }}>
-            <CardMedia
-              component="img"
-              height="200"
-              image={para}
-              alt="Paragraph Image"
-            />
-            <CardContent>
-              <Typography variant="h5" component="div" gutterBottom>
-                Generate a Paragraph from Words
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Click the button below to generate the Paragraph.
-              </Typography>
-              <Link to="/paragraph" style={{ textDecoration: "none" }}>
-                <Button variant="contained" color="primary">
-                  Generate the Paragraph
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ textAlign: "center" }}>
-            <CardMedia
-              component="img"
-              height="200"
-              image={bot}
-              alt="Chatbot Image"
-            />
-            <CardContent>
-              <Typography variant="h5" component="div" gutterBottom>
-                ShrihariBot
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Click the button below to chat with Shrihari's Bot.
-              </Typography>
-              <Link to="/chatbot" style={{ textDecoration: "none" }}>
-                <Button variant="contained" color="primary">
-                  Chat with Shrihari's Bot
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={4} lg={3}>
-          <Card sx={{ textAlign: "center" }}>
-            <CardMedia
-              component="img"
-              height="200"
-              image={travis}
-              alt="SciFi Image"
-            />
-            <CardContent>
-              <Typography variant="h5" component="div" gutterBottom>
-                Generate a Sci-Fi Image from Text
-              </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Click the button below to generate a Sci-Fi image.
-              </Typography>
-              <Link to="/image" style={{ textDecoration: "none" }}>
-                <Button variant="contained" color="primary">
-                  Generate a Sci-Fi Image
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </Grid>
+        {cards}
       </Grid>
     </Box>
   );
 };
 
-export default Dashboard;
+export default React.memo(Dashboard);

@@ -1,9 +1,5 @@
-import React from "react";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
+import React, { useCallback } from "react";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 import axios from "axios";
@@ -27,7 +23,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const loggedin = !!localStorage.getItem("authToken"); // Check if authToken exists
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await axios.post(`${apiUrl}/api/v1/auth/logout`);
       localStorage.removeItem("authToken");
@@ -36,7 +32,7 @@ const Navbar = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [navigate]);
 
   return (
     <AppBar
@@ -109,4 +105,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

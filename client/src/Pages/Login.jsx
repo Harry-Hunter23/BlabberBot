@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useReducer, useCallback } from "react";
 import axios from "axios";
 import {
   TextField,
@@ -16,28 +16,43 @@ import {
 import { Visibility, VisibilityOff, ContentCopy } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+
 const apiUrl = import.meta.env.VITE_API_URL;
+
+const initialState = {
+  email: "",
+  password: "",
+  showPassword: false,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "SET_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "TOGGLE_PASSWORD":
+      return { ...state, showPassword: !state.showPassword };
+    default:
+      return state;
+  }
+}
 
 const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = useCallback((e) => {
+    dispatch({
+      type: "SET_FIELD",
+      field: e.target.name,
+      value: e.target.value,
+    });
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const { email, password } = formData;
+    const { email, password } = state;
 
     if (!email || !password) {
       toast.error("Please fill in all fields to login");
@@ -49,7 +64,6 @@ const Login = () => {
         email,
         password,
       });
-      console.log(data);
       if (data.token.authToken) {
         toast.success("Login successful");
         localStorage.setItem("authToken", data.token.authToken);
@@ -67,7 +81,7 @@ const Login = () => {
   };
 
   const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
+    dispatch({ type: "TOGGLE_PASSWORD" });
   };
 
   const handleCopy = (text) => {
@@ -78,12 +92,7 @@ const Login = () => {
   return (
     <Container maxWidth={isMobile ? "xs" : "sm"}>
       <Toaster />
-      <Box
-        sx={{
-          mt: 5,
-          px: isMobile ? 2 : 3,
-        }}
-      >
+      <Box sx={{ mt: 5, px: isMobile ? 2 : 3 }}>
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Login
         </Typography>
@@ -93,7 +102,7 @@ const Login = () => {
             label="Email"
             name="email"
             type="email"
-            value={formData.email}
+            value={state.email}
             onChange={handleChange}
             margin="normal"
           />
@@ -101,8 +110,8 @@ const Login = () => {
             fullWidth
             label="Password"
             name="password"
-            type={showPassword ? "text" : "password"}
-            value={formData.password}
+            type={state.showPassword ? "text" : "password"}
+            value={state.password}
             onChange={handleChange}
             margin="normal"
             InputProps={{
@@ -113,17 +122,25 @@ const Login = () => {
                     onClick={handleClickShowPassword}
                     edge="end"
                   >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                    {state.showPassword ? <VisibilityOff /> : <Visibility />}
                   </IconButton>
                 </InputAdornment>
               ),
             }}
           />
-          <Paper sx={{ mt: 4, p: 2, textAlign: "center" }} elevation={3}>
+          <Paper
+            elevation={3}
+            sx={{
+              mt: 4,
+              p: 2,
+              textAlign: "center",
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              borderRadius: "10px",
+            }}
+          >
             <Typography variant="h6" gutterBottom>
               Demo Credentials
             </Typography>
-
             <Box
               sx={{
                 display: "flex",
@@ -132,10 +149,15 @@ const Login = () => {
                 mb: 1,
               }}
             >
-              <Typography variant="body1">Email: testing1@gmail.com</Typography>
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", color: "black" }}
+              >
+                Email: testing1@gmail.com
+              </Typography>
               <Tooltip title="Copy Email">
                 <IconButton onClick={() => handleCopy("testing1@gmail.com")}>
-                  <ContentCopy />
+                  <ContentCopy sx={{ color: "#3f51b5" }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -146,10 +168,15 @@ const Login = () => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body1">Password: testing123</Typography>
+              <Typography
+                variant="body1"
+                sx={{ fontWeight: "bold", color: "black" }}
+              >
+                Password: testing123
+              </Typography>
               <Tooltip title="Copy Password">
                 <IconButton onClick={() => handleCopy("testing123")}>
-                  <ContentCopy />
+                  <ContentCopy sx={{ color: "#3f51b5" }} />
                 </IconButton>
               </Tooltip>
             </Box>
@@ -165,4 +192,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default React.memo(Login);

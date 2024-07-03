@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Typography,
   Box,
@@ -27,9 +27,48 @@ const bounce = keyframes`
   }
 `;
 
+const tools = [
+  {
+    text: "Text Summarizer",
+    icon: <Summarize fontSize="large" color="primary" />,
+  },
+  {
+    text: "Paragraph Generator",
+    icon: <Create fontSize="large" color="secondary" />,
+  },
+  {
+    text: "Shrihari-Bot 🤖",
+    icon: <EmojiPeople fontSize="large" sx={{ color: "#FF5722" }} />,
+  },
+  {
+    text: "Sci-Fi Image Generator",
+    icon: <Image fontSize="large" color="action" />,
+  },
+];
+
 const HomePage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const toolList = useMemo(
+    () =>
+      tools.map((tool, index) => (
+        <ListItem
+          key={tool.text}
+          sx={{
+            animation: `${bounce} 2s infinite`,
+            animationDelay: `${index * 0.2}s`,
+          }}
+        >
+          <ListItemIcon>{tool.icon}</ListItemIcon>
+          <ListItemText
+            primary={tool.text}
+            sx={{ fontSize: isMobile ? "1rem" : "1.2rem" }}
+          />
+        </ListItem>
+      )),
+    [isMobile]
+  );
 
   return (
     <Box>
@@ -58,6 +97,7 @@ const HomePage = () => {
           color: "white",
           textAlign: "center",
           padding: 4,
+          ...(isMobile && { padding: 2 }),
         }}
       >
         <Paper
@@ -90,42 +130,7 @@ const HomePage = () => {
             >
               Available Tools:
             </Typography>
-            <List>
-              {[
-                {
-                  text: "Text Summarizer",
-                  icon: <Summarize fontSize="large" color="primary" />,
-                },
-                {
-                  text: "Paragraph Generator",
-                  icon: <Create fontSize="large" color="secondary" />,
-                },
-                {
-                  text: "Shrihari-Bot 🤖",
-                  icon: (
-                    <EmojiPeople fontSize="large" sx={{ color: "#FF5722" }} />
-                  ),
-                },
-                {
-                  text: "Sci-Fi Image Generator",
-                  icon: <Image fontSize="large" color="action" />,
-                },
-              ].map((tool, index) => (
-                <ListItem
-                  key={tool.text}
-                  sx={{
-                    animation: `${bounce} 2s infinite`,
-                    animationDelay: `${index * 0.2}s`,
-                  }}
-                >
-                  <ListItemIcon>{tool.icon}</ListItemIcon>
-                  <ListItemText
-                    primary={tool.text}
-                    sx={{ fontSize: isMobile ? "1rem" : "1.2rem" }}
-                  />
-                </ListItem>
-              ))}
-            </List>
+            <List>{toolList}</List>
           </Box>
           <Typography
             variant={isMobile ? "body2" : "h6"}
@@ -140,4 +145,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default React.memo(HomePage);
