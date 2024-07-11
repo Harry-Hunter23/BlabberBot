@@ -1,5 +1,12 @@
-import React, { useCallback } from "react";
-import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
+import React, { useCallback, useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Box,
+  LinearProgress,
+} from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { keyframes } from "@emotion/react";
 import axios from "axios";
@@ -22,8 +29,10 @@ const bounce = keyframes`
 const Navbar = () => {
   const navigate = useNavigate();
   const loggedin = !!localStorage.getItem("authToken"); // Check if authToken exists
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = useCallback(async () => {
+    setLoading(true);
     try {
       await axios.post(`${apiUrl}/api/v1/auth/logout`);
       localStorage.removeItem("authToken");
@@ -31,6 +40,9 @@ const Navbar = () => {
       navigate("/login");
     } catch (error) {
       console.log(error);
+      toast.error("Logout Failed");
+    } finally {
+      setLoading(false);
     }
   }, [navigate]);
 
@@ -40,6 +52,7 @@ const Navbar = () => {
       sx={{ backgroundColor: "#3f51b5", height: "100px" }}
     >
       <Toaster />
+      {loading && <LinearProgress />}
       <Toolbar
         sx={{ flexDirection: "column", alignItems: "center", height: "100%" }}
       >
@@ -66,6 +79,7 @@ const Navbar = () => {
                 },
               }}
               onClick={handleLogout}
+              disabled={loading}
             >
               Logout
             </Button>

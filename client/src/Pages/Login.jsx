@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback } from "react";
+import React, { useReducer, useCallback, useState } from "react";
 import axios from "axios";
 import {
   TextField,
@@ -12,8 +12,15 @@ import {
   useTheme,
   Tooltip,
   Paper,
+  LinearProgress,
+  CircularProgress,
 } from "@mui/material";
-import { Visibility, VisibilityOff, ContentCopy } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  ContentCopy,
+  HourglassEmpty,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -41,6 +48,7 @@ const Login = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = useCallback((e) => {
     dispatch({
@@ -50,44 +58,48 @@ const Login = () => {
     });
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { email, password } = state;
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      const { email, password } = state;
 
-    if (!email || !password) {
-      toast.error("Please fill in all fields to login");
-      return;
-    }
-
-    try {
-      const { data } = await axios.post(`${apiUrl}/api/v1/auth/login`, {
-        email,
-        password,
-      });
-      if (data.token.authToken) {
-        toast.success("Login successful");
-        localStorage.setItem("authToken", data.token.authToken);
-        navigate("/dashboard");
-      } else {
-        toast.error("Invalid login response");
+      if (!email || !password) {
+        toast.error("Please fill in all fields to login");
+        return;
       }
-    } catch (error) {
-      if (error.response && error.response.data.error) {
-        toast.error(error.response.data.error);
-      } else {
-        toast.error("Login Failed");
-      }
-    }
-  };
 
-  const handleClickShowPassword = () => {
+      setLoading(true);
+
+      try {
+        const { data } = await axios.post(`${apiUrl}/api/v1/auth/login`, {
+          email,
+          password,
+        });
+        if (data.token.authToken) {
+          toast.success("Login successful");
+          localStorage.setItem("authToken", data.token.authToken);
+          navigate("/dashboard");
+        } else {
+          toast.error("Invalid login response");
+        }
+      } catch (error) {
+        const errorMessage = error.response?.data?.error || "Login Failed";
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [state, navigate]
+  );
+
+  const handleClickShowPassword = useCallback(() => {
     dispatch({ type: "TOGGLE_PASSWORD" });
-  };
+  }, []);
 
-  const handleCopy = (text) => {
+  const handleCopy = useCallback((text) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
-  };
+  }, []);
 
   return (
     <Container maxWidth={isMobile ? "xs" : "sm"}>
@@ -96,6 +108,40 @@ const Login = () => {
         <Typography variant="h4" component="h1" align="center" gutterBottom>
           Login
         </Typography>
+        {loading && (
+          <Box
+            sx={{
+              width: "100%",
+              mb: 2,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+            }}
+          >
+            <CircularProgress />
+            <Box
+              sx={{
+                mt: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <HourglassEmpty
+                sx={{
+                  mr: 1,
+                  color: theme.palette.primary.main,
+                }}
+              />
+              <Typography variant="body2">
+                Render may delay initial requests for up to 50 seconds due to
+                the free instance, so please wait.
+              </Typography>
+            </Box>
+          </Box>
+        )}
         <form onSubmit={handleSubmit}>
           <TextField
             fullWidth
@@ -182,7 +228,12 @@ const Login = () => {
             </Box>
           </Paper>
           <Box sx={{ mt: 2, textAlign: "center" }}>
-            <Button type="submit" variant="contained" color="primary">
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+            >
               Login
             </Button>
           </Box>

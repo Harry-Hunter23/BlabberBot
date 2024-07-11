@@ -16,8 +16,10 @@ import {
   InputAdornment,
   useMediaQuery,
   useTheme,
+  LinearProgress,
+  CircularProgress,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, HourglassEmpty } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import roboImage from "../assets/robogif.gif";
@@ -47,6 +49,7 @@ const Register = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = useCallback((e) => {
     dispatch({
@@ -73,6 +76,8 @@ const Register = () => {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await axios.post(`${apiUrl}/api/v1/auth/register`, {
         username,
@@ -89,6 +94,8 @@ const Register = () => {
       } else {
         toast.error("Registration Failed");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -140,6 +147,40 @@ const Register = () => {
           <Typography variant="h4" component="h1" align="center" gutterBottom>
             Register
           </Typography>
+          {loading && (
+            <Box
+              sx={{
+                width: "100%",
+                mb: 2,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              <CircularProgress />
+              <Box
+                sx={{
+                  mt: 2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <HourglassEmpty
+                  sx={{
+                    mr: 1,
+                    color: theme.palette.primary.main,
+                  }}
+                />
+                <Typography variant="body2">
+                  Render may delay initial requests for up to 50 seconds due to
+                  the free instance, so please wait.
+                </Typography>
+              </Box>
+            </Box>
+          )}
           <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
@@ -182,7 +223,12 @@ const Register = () => {
             />
 
             <Box sx={{ mt: 2, textAlign: "center" }}>
-              <Button type="submit" variant="contained" color="primary">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={loading}
+              >
                 Register
               </Button>
             </Box>
